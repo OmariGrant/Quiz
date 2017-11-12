@@ -3,6 +3,8 @@ import pickle
 #CSV file
 import csv
 import os.path
+#random number
+import random
 
 
 #registration function
@@ -44,7 +46,7 @@ def login():
                 username_ver = username
                 return username_ver
     
-#run quiz
+#run quiz setup
 def quiz(username):
     #set input
     print("quiz by " + username)
@@ -70,16 +72,43 @@ def quiz(username):
         quiz_file_writer = csv.DictWriter(quiz_file, fieldnames=quiz_file_header)
         if not quiz_file_exists:
             quiz_file_writer.writeheader()
-        quiz_file_writer.writerow(quiz_details)    
-    
+        quiz_file_writer.writerow(quiz_details)
 
+    startQuiz(topics[topic_selected], difficulty[difficulty_selected])
+
+#start selected quiz
+def startQuiz(topic, difficulty):
+    history_file = os.path.join(scriptpath, 'Quizes/history.csv')
+    if (difficulty == 'Easy'):
+        answers_shown = 2
+    elif (difficulty == 'Medium'):
+        answers_shown = 3
+    elif (difficulty == 'Hard'):
+        answers_shown = 4
+
+    #if (topic == 'Computer Science'):
+        #open comp sci quiz
+    if (topic == 'History'):
+        #open History quiz
+        with open(history_file, newline='') as f:
+            reader = csv.reader(f)
+            for row in reader:
+                print("Question:")
+                print(row[0])
+                print("Here are your options")
+                for x in range(0, answers_shown):
+                    random_answers = random.randint(2,5)
+                    answer_map = {x: row[x+2]}
+                    print("Answer map: " + answer_map[x])
+                    print("Answer " + str(x) + " = " + row[random_answers])
+            answer_given = input("Enter your answer (Number only): ")
+        
 
 ########Start program##############
 scriptpath = os.path.dirname(__file__)
 initial = input("Enter 1 to Login or enter 2 to Register: ")
 
 
-print(initial)
 if initial == '1':
     username = login()
     if username is None:
