@@ -5,7 +5,7 @@ import csv
 import os.path
 #random number
 import random
-
+from random import shuffle
 
 #registration function
 def register():
@@ -79,6 +79,12 @@ def quiz(username):
 #start selected quiz
 def startQuiz(topic, difficulty):
     history_file = os.path.join(scriptpath, 'Quizes/history.csv')
+    isAnswerPresent = 0
+    score = 0
+    answerID = -1
+    skipHeader = 1
+   
+    
     if (difficulty == 'Easy'):
         answers_shown = 2
     elif (difficulty == 'Medium'):
@@ -93,15 +99,40 @@ def startQuiz(topic, difficulty):
         with open(history_file, newline='') as f:
             reader = csv.reader(f)
             for row in reader:
+                #skip the CSV header
+                if skipHeader == 1:
+                    skipHeader = 0
+                    continue
+                
                 print("Question:")
                 print(row[0])
                 print("Here are your options")
+                answer_list = [4, 3, 2, 1]
                 for x in range(0, answers_shown):
-                    random_answers = random.randint(2,5)
-                    answer_map = {x: row[x+2]}
-                    print("Answer map: " + answer_map[x])
+                    #random_integer = random.randint(1,5)
+                    shuffle(answer_list)
+                    random_answers = answer_list[0]
+                    del answer_list[0]
+                    
+                    answer_map = {x: row[random_answers]}
+
+                    #checks for if answer
+                    if(random_answers == 1):
+                        isAnswerPresent = 1
+                        answerID = x
+                        
+                    
                     print("Answer " + str(x) + " = " + row[random_answers])
-            answer_given = input("Enter your answer (Number only): ")
+                    
+                print("The answer is " + str(answerID))
+                answer_given = input("Enter your answer (Number only): ")
+                if int(answer_given) == answerID:
+                    score = score+1
+                    print("Correct")
+                else:
+                    print("Sorry wrong answer")
+        print(str(score))
+                
         
 
 ########Start program##############
