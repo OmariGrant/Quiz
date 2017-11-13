@@ -1,5 +1,3 @@
-# save dictionary to file
-import pickle
 #CSV file
 import csv
 import os.path
