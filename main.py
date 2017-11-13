@@ -15,7 +15,6 @@ def register():
     year = input("Enter your year group: ")
     password = input("Enter your password: ")
     username = name[:3] + age
-    reg_file = username+"_details.txt"
     #set up CSV file
     login_file_exists = os.path.isfile("login.csv")
     login_file = open("login.csv", "a", newline='')
@@ -63,18 +62,26 @@ def quiz(username):
         print("Enter number " + key + " for ", value)
     difficulty_selected = input("Which difficulty would you like? (Enter number only): ")
 
+    ##start quiz and get score
+    score = startQuiz(topics[topic_selected], difficulty[difficulty_selected])
+    grades_all = {100: "A", 80: "B", 60: "C", 40: "D", 20: "E"}
+    percentage = score * 20
+    grade = grades_all[percentage]
+    print("You Scored: " + str(score) + " out of 5 which is " + str(percentage) + "% and a grade " + str(grade))
+    
+
     #quiz csv
     quiz_file_exists = os.path.isfile("quiz.csv")
     quiz_file = open("quiz.csv", "a", newline='')
-    quiz_details = {'Topic' : topics[topic_selected], 'Difficulty' : difficulty[difficulty_selected], 'Username' : username}
+    quiz_details = {'Topic' : topics[topic_selected], 'Difficulty' : difficulty[difficulty_selected], 'Username' : username, 'Score': score, 'Percentage': percentage, 'Grade': grade}
     with quiz_file:
-        quiz_file_header = ['Topic', 'Difficulty', 'Username']
+        quiz_file_header = ['Topic', 'Difficulty', 'Username', 'Score', 'Percentage', 'Grade']
         quiz_file_writer = csv.DictWriter(quiz_file, fieldnames=quiz_file_header)
         if not quiz_file_exists:
             quiz_file_writer.writeheader()
         quiz_file_writer.writerow(quiz_details)
 
-    startQuiz(topics[topic_selected], difficulty[difficulty_selected])
+
 
 #start selected quiz
 def startQuiz(topic, difficulty):
@@ -94,6 +101,7 @@ def startQuiz(topic, difficulty):
 
     #if (topic == 'Computer Science'):
         #open comp sci quiz
+    ######History Quiz########
     if (topic == 'History'):
         #open History quiz
         with open(history_file, newline='') as f:
@@ -107,7 +115,12 @@ def startQuiz(topic, difficulty):
                 print("Question:")
                 print(row[0])
                 print("Here are your options")
-                answer_list = [4, 3, 2, 1]
+                if difficulty == "Hard":
+                    answer_list = [4, 3, 2, 1]
+                elif difficulty == "Medium":
+                    answer_list = [4, 3, 1]
+                elif difficulty == "Easy":
+                    answer_list = [3, 1]
                 for x in range(0, answers_shown):
                     #random_integer = random.randint(1,5)
                     shuffle(answer_list)
@@ -120,24 +133,73 @@ def startQuiz(topic, difficulty):
                     if(random_answers == 1):
                         isAnswerPresent = 1
                         answerID = x
-                        
-                    
+
                     print("Answer " + str(x) + " = " + row[random_answers])
                     
-                print("The answer is " + str(answerID))
                 answer_given = input("Enter your answer (Number only): ")
                 if int(answer_given) == answerID:
                     score = score+1
                     print("Correct")
                 else:
                     print("Sorry wrong answer")
-        print(str(score))
+        return score
+                
+###report by username
+def reportByUser():
+    quiz_file = os.path.join(scriptpath, 'quiz.csv')
+    username = input("Enter a confimred username: ")
+    with open('quiz.csv', newline='') as f:
+        reader = csv.reader(f)
+        print('"Topic", ', '"Difficulty", ', '"Username", ', '"Score", ', '"Percentage", ', '"Grade"')
+        for row in reader:
+            if username == row[2]:
+                print(row)
+
+##report by topic and difficulty
+def reportByTopic():
+    quiz_file = os.path.join(scriptpath, 'quiz.csv')
+    avg_score = 0
+    total_score = 0
+    high_score = 0
+    high_scorer = ""
+    counter = 0
+    
+    topic = input("Enter 1 for Computer Science or 2 for History: ")
+    if topic == "1":
+        topic = "Computer Science"
+    elif topic == "2":
+        topic = "History"
+    difficulty = input("Enter 1 Easy or 2 for Medium or 3 for Hard: ")
+    if difficulty == "1":
+        difficulty = "Easy"
+    elif difficulty == "2":
+        difficulty = "Medium"
+    elif difficulty == "3":
+        difficulty = "Hard"
+        
+    with open('quiz.csv', newline='') as f:
+        reader = csv.reader(f)
+        print('"Topic", ', '"Difficulty", ', '"Username", ', '"Score", ', '"Percentage", ', '"Grade", ')
+        for row in reader:
+            if topic == row[0] and difficulty == row[1]:
+                print(row)
+                counter=counter+1
+                total_score = total_score + int(row[3])
+                if high_score <= int(row[3]):
+                    high_scorer = row[2]
+                    high_score = int(row[3])
+                    print(str(high_score) + str(high_scorer))
+
+    ##work out average and high score 
+    avg_score = total_score / counter
+    print("The average score of this quiz and difficulty is " + str(avg_score))
+    print('The high score was by '  + high_scorer + ' with a score of ' + str(high_score))
+    
                 
         
-
 ########Start program##############
 scriptpath = os.path.dirname(__file__)
-initial = input("Enter 1 to Login or enter 2 to Register: ")
+initial = input("Enter 1 to Login or enter 2 to Register or 3 for Fergus Username Tool or 4 Topic Tool: ")
 
 
 if initial == '1':
@@ -148,5 +210,8 @@ if initial == '1':
         quiz(username)
 elif initial == '2':
     register()
-
+elif initial == '3':
+    reportByUser()
+elif initial == '4':
+    reportByTopic()
 
