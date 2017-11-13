@@ -29,6 +29,8 @@ def register():
             login_file_writer.writeheader()
         login_file_writer.writerow(login_details)
 
+    initial()
+
 #login function
 def login():
     username = input("Enter Username: ")
@@ -78,6 +80,8 @@ def quiz(username):
         if not quiz_file_exists:
             quiz_file_writer.writeheader()
         quiz_file_writer.writerow(quiz_details)
+
+    initial()
 
 
 
@@ -155,6 +159,8 @@ def reportByUser():
             if username == row[2]:
                 print(row)
 
+    initial()
+
 ##report by topic and difficulty
 def reportByTopic():
     quiz_file = os.path.join(scriptpath, 'quiz.csv')
@@ -194,24 +200,28 @@ def reportByTopic():
     avg_score = total_score / counter
     print("The average score of this quiz and difficulty is " + str(avg_score))
     print('The high score was by '  + high_scorer + ' with a score of ' + str(high_score))
-    
-                
+
+    initial()
+
+def initial():
+    initial = input("Enter 1 to Login or enter 2 to Register or 3 for Fergus Username Tool or 4 Topic Tool: ")
+
+
+    if initial == '1':
+        username = login()
+        if username is None:
+            print("Login Failed")
+        elif username is not None:
+            quiz(username)
+    elif initial == '2':
+        register()
+    elif initial == '3':
+        reportByUser()
+    elif initial == '4':
+        reportByTopic()
         
 ########Start program##############
 scriptpath = os.path.dirname(__file__)
-initial = input("Enter 1 to Login or enter 2 to Register or 3 for Fergus Username Tool or 4 Topic Tool: ")
 
-
-if initial == '1':
-    username = login()
-    if username is None:
-        print("Login Failed")
-    elif username is not None:
-        quiz(username)
-elif initial == '2':
-    register()
-elif initial == '3':
-    reportByUser()
-elif initial == '4':
-    reportByTopic()
+initial()
 
