@@ -83,7 +83,7 @@ def quiz(username):
 
 #start selected quiz
 def startQuiz(topic, difficulty):
-    history_file = os.path.join(scriptpath, 'Quizes/history.csv')
+    
     isAnswerPresent = 0
     score = 0
     answerID = -1
@@ -97,55 +97,57 @@ def startQuiz(topic, difficulty):
     elif (difficulty == 'Hard'):
         answers_shown = 4
 
-    #if (topic == 'Computer Science'):
+    if (topic == 'Computer Science'):
         #open comp sci quiz
+        filename = os.path.join(scriptpath, 'Quizes/compsci.csv')
     ######History Quiz########
     if (topic == 'History'):
         #open History quiz
-        with open(history_file, newline='') as f:
-            reader = csv.reader(f)
-            for row in reader:
-                #skip the CSV header
-                if skipHeader == 1:
-                    skipHeader = 0
-                    continue
+        filename = os.path.join(scriptpath, 'Quizes/history.csv')
+    with open(filename, newline='') as f:
+        reader = csv.reader(f)
+        for row in reader:
+            #skip the CSV header
+            if skipHeader == 1:
+                skipHeader = 0
+                continue
+            
+            print("Question:")
+            print(row[0])
+            print("Here are your options")
+            if difficulty == "Hard":
+                answer_list = [4, 3, 2, 1]
+            elif difficulty == "Medium":
+                answer_list = [4, 3, 1]
+            elif difficulty == "Easy":
+                answer_list = [3, 1]
+            for x in range(0, answers_shown):
                 
-                print("Question:")
-                print(row[0])
-                print("Here are your options")
-                if difficulty == "Hard":
-                    answer_list = [4, 3, 2, 1]
-                elif difficulty == "Medium":
-                    answer_list = [4, 3, 1]
-                elif difficulty == "Easy":
-                    answer_list = [3, 1]
-                for x in range(0, answers_shown):
-                    #random_integer = random.randint(1,5)
-                    shuffle(answer_list)
-                    random_answers = answer_list[0]
-                    del answer_list[0]
-                    
-                    answer_map = {x: row[random_answers]}
+                shuffle(answer_list)
+                random_answers = answer_list[0]
+                del answer_list[0]
+                
+                answer_map = {x: row[random_answers]}
 
-                    #checks for if answer
-                    if(random_answers == 1):
-                        isAnswerPresent = 1
-                        answerID = x
+                #checks for if answer
+                if(random_answers == 1):
+                    isAnswerPresent = 1
+                    answerID = x
 
-                    print("Answer " + str(x) + " = " + row[random_answers])
-                    
-                answer_given = input("Enter your answer (Number only): ")
-                if int(answer_given) == answerID:
-                    score = score+1
-                    print("Correct")
-                else:
-                    print("Sorry wrong answer")
-        return score
+                print("Answer " + str(x) + " = " + row[random_answers])
+                
+            answer_given = input("Enter your answer (Number only): ")
+            if int(answer_given) == answerID:
+                score = score+1
+                print("Correct")
+            else:
+                print("Sorry wrong answer")
+    return score
                 
 ###report by username
 def reportByUser():
     quiz_file = os.path.join(scriptpath, 'quiz.csv')
-    username = input("Enter a confimred username: ")
+    username = input("Enter a confirmed username: ")
     with open('quiz.csv', newline='') as f:
         reader = csv.reader(f)
         print('"Topic", ', '"Difficulty", ', '"Username", ', '"Score", ', '"Percentage", ', '"Grade"')
@@ -186,7 +188,7 @@ def reportByTopic():
                 if high_score <= int(row[3]):
                     high_scorer = row[2]
                     high_score = int(row[3])
-                    print(str(high_score) + str(high_scorer))
+                   
 
     ##work out average and high score 
     avg_score = total_score / counter
